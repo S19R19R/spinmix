@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SpinMix — 2D Scramble Visualizer</title>
+  <title>SpinMix — Scramble Visualizer</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <style>
     .face { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; }
@@ -18,12 +19,17 @@
   </style>
 </head>
 <body class="bg-gray-100 text-gray-900 flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
-  <h1 class="text-2xl font-bold">SpinMix — Scramble Visualizer</h1>
+
+  <!-- Новый логотип -->
+  <img src="logo-optimized.webp" alt="SpinMix Logo" id="logo" class="w-32 h-32 mb-2" />
+
+  <h1 class="text-xl font-bold text-center">SpinMix — Scramble Visualizer</h1>
+
   <div>
     <button onclick="newScramble()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">New Scramble</button>
     <button onclick="copyScramble()" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Copy</button>
   </div>
-  <div id="scramble" class="text-xl font-mono mt-4">Loading...</div>
+  <div id="scramble" class="text-lg font-mono mt-4 text-center">Loading...</div>
 
   <div class="grid grid-cols-3 gap-1 mt-6">
     <div></div>
@@ -147,9 +153,24 @@
       navigator.clipboard.writeText(text);
     }
 
+    function adaptUI() {
+      const w = window.innerWidth;
+      const scale = w < 500 ? 18 : w < 1000 ? 24 : 32;
+      const stickers = document.querySelectorAll('.sticker');
+      stickers.forEach(s => {
+        s.style.width = scale + "px";
+        s.style.height = scale + "px";
+      });
+
+      const scramble = document.getElementById("scramble");
+      scramble.style.fontSize = w < 500 ? "1rem" : w < 1000 ? "1.25rem" : "1.5rem";
+    }
+
+    window.addEventListener('resize', adaptUI);
     initCube();
     renderCube();
     newScramble();
+    adaptUI();
   </script>
 </body>
 </html>
