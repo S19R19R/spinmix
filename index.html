@@ -5,24 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SpinMix — Rubik's Cube Scramble Generator</title>
   <meta name="description" content="SpinMix is a free online scramble generator and visualizer for the Rubik’s Cube (2x2, 3x3, 4x4 and more) with WCA-notation support.">
-  <meta property="og:title" content="SpinMix — Rubik's Cube Scramble Generator">
-  <meta property="og:description" content="Free scramble generator with visual cross layout. Supports official WCA notation.">
-  <meta property="og:image" content="logo-final.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="SpinMix — Rubik’s Cube Scramble Generator">
-  <meta name="twitter:description" content="Online scramble generator with visual 2D layout.">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="canonical" href="https://spinmix.me/">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/cubejs/lib/cube.min.js"></script>
   <style>
     .face { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; }
     .sticker { width: 24px; height: 24px; border: 1px solid #999; }
-    .U { background: white; }
-    .D { background: yellow; }
-    .F { background: green; }
-    .B { background: blue; }
-    .L { background: orange; }
-    .R { background: red; }
     @media (max-width: 500px) {
       .sticker { width: 16px; height: 16px; }
     }
@@ -40,87 +29,57 @@
 
   <div id="scramble" class="text-lg font-mono mt-4 text-center">Loading...</div>
 
-  <!-- Cross layout -->
-  <div class="flex flex-col items-center mt-6 space-y-1" style="user-select:none;">
-    <div class="flex justify-center">
-      <div style="width: 76px;"></div>
-      <div id="U" class="face"></div>
-      <div style="width: 76px;"></div>
-    </div>
-    <div class="flex justify-center" style="margin-left:124px;">
-	  <div id="L" class="face mr-2"></div>
-	  <div id="F" class="face mx-2"></div>
-	  <div id="R" class="face mx-2"></div>
-	  <div id="B" class="face ml-2"></div>
-	</div>
-
-    <div class="flex justify-center">
-      <div style="width: 76px;"></div>
-      <div id="D" class="face"></div>
-      <div style="width: 76px;"></div>
-    </div>
+  <!-- Cube Net Layout (responsive and always centered) -->
+  <div class="grid" style="grid-template-columns: repeat(5, auto); gap: 8px; justify-content: center; user-select:none;">
+    <div></div>
+    <div class="face" id="U"></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div class="face" id="L"></div>
+    <div class="face" id="F"></div>
+    <div class="face" id="R"></div>
+    <div class="face" id="B"></div>
+    <div></div>
+    <div></div>
+    <div class="face" id="D"></div>
+    <div></div>
+    <div></div>
   </div>
 
   <script>
-    const stickers = {
-      U: 'U', D: 'D', F: 'F', B: 'B', L: 'L', R: 'R'
+    const FACE_ORDER = ["U", "L", "F", "R", "B", "D"];
+    const COLOR_MAP = {
+      U: "white",
+      D: "yellow",
+      F: "green",
+      B: "blue",
+      L: "orange",
+      R: "red"
     };
 
-    let cube = {};
-
-    function initCube() {
-      for (let face in stickers) {
-        cube[face] = Array(9).fill(stickers[face]);
-      }
-    }
-
-    function rotateFace(face) {
-      const c = [...cube[face]];
-      cube[face][0] = c[6]; cube[face][1] = c[3]; cube[face][2] = c[0];
-      cube[face][3] = c[7]; cube[face][4] = c[4]; cube[face][5] = c[1];
-      cube[face][6] = c[8]; cube[face][7] = c[5]; cube[face][8] = c[2];
-    }
-
-    function move(face, times = 1) {
-      const map = {
-        U: ['F', 'R', 'B', 'L', [0,1,2]],
-        D: ['F', 'L', 'B', 'R', [6,7,8]],
-        F: ['U', 'R', 'D', 'L', [6,7,8]],
-        B: ['U', 'L', 'D', 'R', [2,1,0]],
-        L: ['U', 'F', 'D', 'B', [0,3,6]],
-        R: ['U', 'B', 'D', 'F', [2,5,8]]
+    function renderCubeState(cube) {
+      // cube.asString() возвращает строку 54 стикеров: U, R, F, D, L, B (по 9)
+      const state = cube.asString();
+      const faceStickers = {
+        U: state.slice(0, 9).split(""),
+        R: state.slice(9, 18).split(""),
+        F: state.slice(18, 27).split(""),
+        D: state.slice(27, 36).split(""),
+        L: state.slice(36, 45).split(""),
+        B: state.slice(45, 54).split("")
       };
-
-      for (let i = 0; i < times; i++) {
-        rotateFace(face);
-        const [f1, f2, f3, f4, idxs] = map[face];
-        const temp = idxs.map(i => cube[f1][i]);
-        idxs.forEach((i, j) => cube[f1][i] = cube[f4][idxs[j]]);
-        idxs.forEach((i, j) => cube[f4][i] = cube[f3][idxs[j]]);
-        idxs.forEach((i, j) => cube[f3][i] = cube[f2][idxs[j]]);
-        idxs.forEach((i, j) => cube[f2][i] = temp[j]);
-      }
-    }
-
-    function applyScramble(scramble) {
-      scramble.split(" ").forEach(m => {
-        if (!m) return;
-        const base = m[0];
-        const count = m.endsWith("2") ? 2 : m.endsWith("'") ? 3 : 1;
-        move(base, count);
-      });
-    }
-
-    function renderCube() {
-      for (let face in cube) {
+      // Наш порядок для развёртки: U, L, F, R, B, D
+      ["U", "L", "F", "R", "B", "D"].forEach(face => {
         const el = document.getElementById(face);
         el.innerHTML = '';
-        cube[face].forEach(c => {
+        faceStickers[face].forEach(c => {
           const div = document.createElement("div");
-          div.className = "sticker " + c;
+          div.className = "sticker";
+          div.style.background = COLOR_MAP[c];
           el.appendChild(div);
         });
-      }
+      });
       adaptUI();
     }
 
@@ -142,9 +101,12 @@
     function newScramble() {
       const s = randomScramble();
       document.getElementById("scramble").innerText = s;
-      initCube();
-      applyScramble(s);
-      renderCube();
+
+      // cubejs: создаём solved-куб и применяем скрамбл
+      const cube = new Cube();
+      cube.move(s);
+
+      renderCubeState(cube);
     }
 
     function copyScramble() {
@@ -159,14 +121,15 @@
       stickers.forEach(s => {
         s.style.width = scale + "px";
         s.style.height = scale + "px";
+        s.style.border = "1px solid #999";
       });
       document.getElementById("scramble").style.fontSize = w < 500 ? "1rem" : w < 1000 ? "1.25rem" : "1.5rem";
     }
 
     window.addEventListener("resize", adaptUI);
-    initCube();
-    renderCube();
-    newScramble();
+    document.addEventListener("DOMContentLoaded", () => {
+      newScramble();
+    });
   </script>
 </body>
 </html>
