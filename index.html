@@ -21,7 +21,7 @@
 <body class="bg-gray-100 text-gray-900 flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
 
   <!-- Новый логотип -->
-  <img src="logo-optimized.webp" alt="SpinMix Logo" id="logo" class="w-32 h-32 mb-2" />
+  <img src="logo-v2.webp" alt="SpinMix Logo" id="logo" class="w-32 h-32 mb-2" />
 
   <h1 class="text-xl font-bold text-center">SpinMix — Scramble Visualizer</h1>
 
@@ -141,6 +141,7 @@
     }
 
     function newScramble() {
+      adaptUI();
       const s = randomScramble();
       document.getElementById("scramble").innerText = s;
       initCube();
@@ -170,6 +171,7 @@
     initCube();
     renderCube();
     newScramble();
+    adaptUI();
     adaptUI();
   </script>
 </body>
