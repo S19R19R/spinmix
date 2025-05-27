@@ -4,12 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SpinMix — Scramble Generator</title>
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <title>SpinMix — 2D Scramble Visualizer</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <style>
-    .face { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
-    .sticker { width: 30px; height: 30px; border: 1px solid #999; }
+    .face { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; }
+    .sticker { width: 24px; height: 24px; border: 1px solid #999; }
     .U { background: white; }
     .D { background: yellow; }
     .F { background: green; }
@@ -18,98 +17,138 @@
     .R { background: red; }
   </style>
 </head>
-<body class="bg-white text-gray-900 flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
-
-  <!-- Новый логотип -->
-  <img src="logo-optimized.webp" alt="SpinMix Logo" class="w-32 h-32 mb-4" />
-
-  <div class="flex items-center justify-between w-full max-w-xs">
-    <button onclick="newScramble()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-      New Scramble
-    </button>
-    <button onclick="copyScramble()" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">
-      Copy
-    </button>
+<body class="bg-gray-100 text-gray-900 flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
+  <h1 class="text-2xl font-bold">SpinMix — Scramble Visualizer</h1>
+  <div>
+    <button onclick="newScramble()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">New Scramble</button>
+    <button onclick="copyScramble()" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Copy</button>
   </div>
+  <div id="scramble" class="text-xl font-mono mt-4">Loading...</div>
 
-  <div id="scramble" class="text-2xl font-mono text-center tracking-wide mb-2">Loading...</div>
+  <div class="grid grid-cols-3 gap-1 mt-6">
+    <div></div>
+    <div id="U" class="face"></div>
+    <div></div>
 
-  <div class="mb-2">
-    <button onclick="toggleView()" class="text-sm text-blue-600 underline">Switch to 3D View</button>
-  </div>
+    <div id="L" class="face"></div>
+    <div id="F" class="face"></div>
+    <div id="R" class="face"></div>
+    <div id="B" class="face"></div>
 
-  <div id="cube-2d" class="flex space-x-4">
-    <div class="face" id="U"></div>
-    <div class="face" id="F"></div>
-    <div class="face" id="R"></div>
+    <div></div>
+    <div id="D" class="face"></div>
+    <div></div>
   </div>
 
   <script>
-    const moves = ["U", "D", "L", "R", "F", "B"];
-    const modifiers = ["", "'", "2"];
-    const scrambleDiv = document.getElementById("scramble");
+    const stickers = {
+      U: 'U', D: 'D', F: 'F', B: 'B', L: 'L', R: 'R'
+    };
+
+    let cube = {};
+
+    function initCube() {
+      cube = {};
+      for (let face in stickers) {
+        cube[face] = Array(9).fill(stickers[face]);
+      }
+    }
+
+    function rotateFace(face, times = 1) {
+      for (let t = 0; t < times; t++) {
+        const c = [...cube[face]];
+        cube[face][0] = c[6];
+        cube[face][1] = c[3];
+        cube[face][2] = c[0];
+        cube[face][3] = c[7];
+        cube[face][4] = c[4];
+        cube[face][5] = c[1];
+        cube[face][6] = c[8];
+        cube[face][7] = c[5];
+        cube[face][8] = c[2];
+      }
+    }
+
+    function move(m) {
+      const base = m[0];
+      const prime = m.includes("'");
+      const double = m.includes("2");
+      const times = double ? 2 : 1;
+      const direction = prime ? 3 - times + 1 : times;
+
+      const rotateMap = {
+        U: ['F', 'R', 'B', 'L', [0,1,2]],
+        D: ['F', 'L', 'B', 'R', [6,7,8]],
+        F: ['U', 'R', 'D', 'L', [6,7,8]],
+        B: ['U', 'L', 'D', 'R', [2,1,0]],
+        L: ['U', 'F', 'D', 'B', [0,3,6]],
+        R: ['U', 'B', 'D', 'F', [2,5,8]],
+      };
+
+      rotateFace(base, direction);
+
+      const [f1, f2, f3, f4, idxs] = rotateMap[base];
+      for (let i = 0; i < direction; i++) {
+        const temp = idxs.map(j => cube[f1][j]);
+        for (let j = 0; j < 3; j++) {
+          cube[f1][idxs[j]] = cube[f4][idxs[j]];
+          cube[f4][idxs[j]] = cube[f3][idxs[j]];
+          cube[f3][idxs[j]] = cube[f2][idxs[j]];
+          cube[f2][idxs[j]] = temp[j];
+        }
+      }
+    }
+
+    function applyScramble(scramble) {
+      scramble.split(' ').forEach(m => move(m));
+    }
+
+    function renderCube() {
+      for (let face in cube) {
+        const faceDiv = document.getElementById(face);
+        faceDiv.innerHTML = '';
+        for (let s of cube[face]) {
+          const d = document.createElement('div');
+          d.className = 'sticker ' + s;
+          faceDiv.appendChild(d);
+        }
+      }
+    }
 
     function randomScramble(length = 20) {
-      let scramble = [];
-      let prevMove = "";
+      const moves = ['U','D','L','R','F','B'];
+      const suffix = ["", "'", "2"];
+      let result = [];
+      let last = "";
 
       for (let i = 0; i < length; i++) {
         let move;
         do {
           move = moves[Math.floor(Math.random() * moves.length)];
-        } while (move === prevMove);
-        prevMove = move;
-        let modifier = modifiers[Math.floor(Math.random() * modifiers.length)];
-        scramble.push(move + modifier);
+        } while (move === last);
+        last = move;
+        const suf = suffix[Math.floor(Math.random() * suffix.length)];
+        result.push(move + suf);
       }
 
-      return scramble.join(" ");
-    }
-
-    function applyScrambleToCube() {
-      const faces = ["U", "F", "R"];
-      for (let f of faces) {
-        const face = document.getElementById(f);
-        face.innerHTML = '';
-        for (let i = 0; i < 9; i++) {
-          const d = document.createElement("div");
-          d.className = "sticker " + f;
-          face.appendChild(d);
-        }
-      }
+      return result.join(" ");
     }
 
     function newScramble() {
       const s = randomScramble();
-      scrambleDiv.innerText = s;
-      applyScrambleToCube();
+      document.getElementById("scramble").innerText = s;
+      initCube();
+      applyScramble(s);
+      renderCube();
     }
 
     function copyScramble() {
-      const text = scrambleDiv.innerText;
+      const text = document.getElementById("scramble").innerText;
       navigator.clipboard.writeText(text);
     }
 
-    function toggleView() {
-      const val = localStorage.getItem("view");
-      if (val === "3d") {
-        localStorage.setItem("view", "2d");
-        alert("Switched to 2D view.");
-      } else {
-        localStorage.setItem("view", "3d");
-        alert("Switched to 3D view (coming soon)");
-      }
-    }
-
-    function checkView() {
-      const val = localStorage.getItem("view");
-      if (val === "3d") {
-        document.getElementById("cube-2d").style.display = "none";
-        scrambleDiv.insertAdjacentHTML("afterend", "<div class='text-gray-500'>3D View coming soon</div>");
-      }
-    }
-
-    checkView();
+    initCube();
+    renderCube();
     newScramble();
   </script>
 </body>
