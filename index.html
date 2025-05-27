@@ -1,35 +1,49 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="icon" type="image/png" href="favicon.png">
   <title>SpinMix — Scramble Generator</title>
-  <link rel="icon" type="image/png" href="favicon.ico">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .face { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    .sticker { width: 30px; height: 30px; border: 1px solid #999; }
+    .U { background: white; }
+    .D { background: yellow; }
+    .F { background: green; }
+    .B { background: blue; }
+    .L { background: orange; }
+    .R { background: red; }
+  </style>
 </head>
-<body class="bg-white text-gray-900 flex flex-col items-center justify-center min-h-screen p-4">
-  <!-- Логотип (увеличен) -->
-  <img src="logo.png" alt="SpinMix Logo" class="w-40 h-40 mb-4" />
-
-  <!-- Скрамбл -->
-  <div id="scramble" class="text-4xl font-mono text-center mb-6 tracking-wide">Loading...</div>
-
-  <!-- Кнопки -->
-  <div class="flex gap-4 mb-6">
+<body class="bg-white text-gray-900 flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
+  <div class="flex items-center justify-between w-full max-w-xs">
     <button onclick="newScramble()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
       New Scramble
     </button>
     <button onclick="copyScramble()" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">
-      Copy Scramble
+      Copy
     </button>
   </div>
 
-  <p class="text-sm text-gray-500">Official WCA scramble (3x3)</p>
+  <div id="scramble" class="text-2xl font-mono text-center tracking-wide mb-2">Loading...</div>
+
+  <div class="mb-2">
+    <button onclick="toggleView()" class="text-sm text-blue-600 underline">Switch to 3D View</button>
+  </div>
+
+  <div id="cube-2d" class="flex space-x-4">
+    <div class="face" id="U"></div>
+    <div class="face" id="F"></div>
+    <div class="face" id="R"></div>
+  </div>
 
   <script>
     const moves = ["U", "D", "L", "R", "F", "B"];
     const modifiers = ["", "'", "2"];
+    const scrambleDiv = document.getElementById("scramble");
 
     function randomScramble(length = 20) {
       let scramble = [];
@@ -40,7 +54,6 @@
         do {
           move = moves[Math.floor(Math.random() * moves.length)];
         } while (move === prevMove);
-
         prevMove = move;
         let modifier = modifiers[Math.floor(Math.random() * modifiers.length)];
         scramble.push(move + modifier);
@@ -49,16 +62,50 @@
       return scramble.join(" ");
     }
 
+    function applyScrambleToCube() {
+      const faces = ["U", "F", "R"];
+      for (let f of faces) {
+        const face = document.getElementById(f);
+        face.innerHTML = '';
+        for (let i = 0; i < 9; i++) {
+          const d = document.createElement("div");
+          d.className = "sticker " + f;
+          face.appendChild(d);
+        }
+      }
+    }
+
     function newScramble() {
       const s = randomScramble();
-      document.getElementById("scramble").innerText = s;
+      scrambleDiv.innerText = s;
+      applyScrambleToCube();
     }
 
     function copyScramble() {
-      const text = document.getElementById("scramble").innerText;
+      const text = scrambleDiv.innerText;
       navigator.clipboard.writeText(text);
     }
 
+    function toggleView() {
+      const val = localStorage.getItem("view");
+      if (val === "3d") {
+        localStorage.setItem("view", "2d");
+        alert("Switched to 2D view.");
+      } else {
+        localStorage.setItem("view", "3d");
+        alert("Switched to 3D view (coming soon)");
+      }
+    }
+
+    function checkView() {
+      const val = localStorage.getItem("view");
+      if (val === "3d") {
+        document.getElementById("cube-2d").style.display = "none";
+        scrambleDiv.insertAdjacentHTML("afterend", "<div class='text-gray-500'>3D View coming soon</div>");
+      }
+    }
+
+    checkView();
     newScramble();
   </script>
 </body>
