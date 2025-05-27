@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,7 +20,7 @@
 <body class="bg-gray-100 text-gray-900 flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
 
   <!-- Новый логотип -->
-  <img src="logo-v2.webp" alt="SpinMix Logo" id="logo" class="w-32 h-32 mb-2" />
+  <img src="logo-final.png" alt="SpinMix Logo" id="logo" class="w-32 h-32 mb-2" />
 
   <h1 class="text-xl font-bold text-center">SpinMix — Scramble Visualizer</h1>
 
@@ -31,19 +30,20 @@
   </div>
   <div id="scramble" class="text-lg font-mono mt-4 text-center">Loading...</div>
 
-  <div class="grid grid-cols-3 gap-1 mt-6">
-    <div></div>
-    <div id="U" class="face"></div>
-    <div></div>
-
-    <div id="L" class="face"></div>
-    <div id="F" class="face"></div>
-    <div id="R" class="face"></div>
-    <div id="B" class="face"></div>
-
-    <div></div>
-    <div id="D" class="face"></div>
-    <div></div>
+  <!-- Крестовая развёртка -->
+  <div class="flex flex-col items-center mt-6 space-y-1">
+    <div class="flex justify-center">
+      <div id="U" class="face"></div>
+    </div>
+    <div class="flex">
+      <div id="L" class="face"></div>
+      <div id="F" class="face"></div>
+      <div id="R" class="face"></div>
+      <div id="B" class="face"></div>
+    </div>
+    <div class="flex justify-center">
+      <div id="D" class="face"></div>
+    </div>
   </div>
 
   <script>
@@ -119,6 +119,7 @@
           faceDiv.appendChild(d);
         }
       }
+      adaptUI();
     }
 
     function randomScramble(length = 20) {
@@ -141,12 +142,12 @@
     }
 
     function newScramble() {
-      adaptUI();
       const s = randomScramble();
       document.getElementById("scramble").innerText = s;
       initCube();
       applyScramble(s);
       renderCube();
+      adaptUI();
     }
 
     function copyScramble() {
@@ -171,7 +172,6 @@
     initCube();
     renderCube();
     newScramble();
-    adaptUI();
     adaptUI();
   </script>
 </body>
