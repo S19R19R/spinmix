@@ -1,94 +1,207 @@
 <!DOCTYPE html>
-
-<html class="transition-colors duration-300" lang="en">
+<html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SpinMix — Rubik's Cube Scramble Generator</title>
-<meta content="SpinMix is a free online scramble generator and visualizer for the Rubik’s Cube (2x2, 3x3, 4x4 and more) with WCA-notation support." name="description"/>
-<!-- Google tag (gtag.js) -->
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-P0DLH9JPVQ"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SpinMix — Rubik's Cube Scramble Generator</title>
+  <meta name="description" content="SpinMix is a free online scramble generator and visualizer for the Rubik’s Cube.">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/cubejs/lib/cube.min.js"></script>
+  <style>
+    body.light {
+      background-color: #f3f4f6;
+      color: #111827;
+    }
 
-<link href="favicon.ico" rel="icon" type="image/x-icon"/>
-<link href="https://spinmix.me/" rel="canonical"/>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/cubejs/lib/cube.min.js"></script>
-<style>
-    .face { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; }
-    .sticker { width: 24px; height: 24px; border: 1px solid #999; }
+    body.dark {
+      background-color: #111827;
+      color: #f3f4f6;
+    }
+
+    .face {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+    }
+
+    .sticker {
+      width: 24px;
+      height: 24px;
+      border: 1px solid #999;
+    }
+
     @media (max-width: 500px) {
-      .sticker { width: 16px; height: 16px; }
+      .sticker {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    .settings-panel {
+      position: absolute;
+      right: 1rem;
+      top: 3.5rem;
+      background-color: white;
+      color: black;
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      border-radius: 8px;
+      z-index: 10;
+    }
+
+    body.dark .settings-panel {
+      background-color: #1f2937;
+      color: #f3f4f6;
+      border-color: #555;
     }
   </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col items-center justify-center min-h-screen p-2 space-y-4">
-<div class="absolute top-2 right-2 flex items-center space-x-2">
-<button class="text-gray-700 dark:text-gray-200" id="settings-button">
-<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-<path d="M11.25 3.375c.621-1.072 1.879-1.072 2.5 0l.528.912a1.5 1.5 0 001.287.75h1.056c1.23 0 2.003 1.289 1.434 2.4l-.528.912a1.5 1.5 0 000 1.5l.528.912c.569 1.111-.204 2.4-1.434 2.4h-1.056a1.5 1.5 0 00-1.287.75l-.528.912c-.621 1.072-1.879 1.072-2.5 0l-.528-.912a1.5 1.5 0 00-1.287-.75H8.25c-1.23 0-2.003-1.289-1.434-2.4l.528-.912a1.5 1.5 0 000-1.5l-.528-.912c-.569-1.111.204-2.4 1.434-2.4h1.056a1.5 1.5 0 001.287-.75l.528-.912z" stroke-linecap="round" stroke-linejoin="round"></path>
-<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path>
-</svg>
-</button>
-<div class="hidden bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded p-2 shadow" id="settings-panel">
-<label class="flex items-center space-x-2">
-<input class="form-checkbox" id="theme-toggle" type="checkbox"/>
-<span class="text-sm text-gray-800 dark:text-gray-100">Dark theme</span>
-</label>
-</div>
-</div>
-<img alt="SpinMix logo" class="w-28 h-28 mb-2 mx-auto" src="logo-final.png"/>
-<h1 class="text-xl font-bold text-center text-gray-900 dark:text-gray-100">SpinMix — Rubik's Cube Scramble Generator</h1>
-<p class="text-center text-gray-700 dark:text-gray-300 max-w-lg">Free scramble generator with WCA notation and visual 2D cube layout.</p>
-<div>
-<button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="newScramble()">New Scramble</button>
-<button class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400" onclick="copyScramble()">Copy</button>
-</div>
-<div class="text-lg font-mono mt-4 text-center" id="scramble">Loading...</div>
-<!-- Cube Net Layout (responsive and always centered) -->
-<div class="grid" style="grid-template-columns: repeat(5, auto); gap: 8px; justify-content: center; user-select:none;">
-<div></div>
-<div class="face" id="U"></div>
-<div></div>
-<div></div>
-<div></div>
-<div class="face" id="L"></div>
-<div class="face" id="F"></div>
-<div class="face" id="R"></div>
-<div class="face" id="B"></div>
-<div></div>
-<div></div>
-<div class="face" id="D"></div>
-<div></div>
-<div></div>
-</div>
+<body class="light flex flex-col items-center justify-center min-h-screen p-2 space-y-4">
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const themeToggle = document.getElementById("theme-toggle");
-  const settingsBtn = document.getElementById("settings-button");
-  const settingsPanel = document.getElementById("settings-panel");
+  <!-- Шестерёнка и настройки -->
+  <div class="absolute top-2 right-2">
+    <button id="settings-button" aria-label="Settings">
+      <!-- SVG-шестерёнка -->
+      <svg viewBox="0 0 512 512" width="32" height="32" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+        <path d="m468.046875 194.863281c-4.558594-15.832031-10.890625-31.097656-18.890625-45.550781l16.382812-45.8125-57.039062-57.039062-45.8125 16.378906c-14.453125-7.996094-29.71875-14.328125-45.554688-18.886719l-20.796874-43.953125h-80.671876l-20.796874 43.953125c-15.835938 4.558594-31.101563 10.890625-45.554688 18.890625l-45.8125-16.382812-57.039062 57.039062 16.382812 45.8125c-8 14.453125-14.332031 29.71875-18.890625 45.550781l-43.953125 20.800781v80.671876l43.953125 20.796874c4.558594 15.835938 10.890625 31.101563 18.890625 45.554688l-16.382812 45.8125 57.039062 57.039062 45.8125-16.382812c14.453125 8 29.722656 14.332031 45.554688 18.890625l20.796874 43.953125h80.671876l20.796874-43.953125c15.832032-4.558594 31.101563-10.890625 45.554688-18.890625l45.8125 16.382812 57.039062-57.039062-16.382812-45.8125c8-14.453125 14.332031-29.71875 18.890625-45.554688l43.953125-20.796874v-80.671876zm-81.410156 61.136719c0 72.035156-58.601563 130.636719-130.636719 130.636719s-130.636719-58.601563-130.636719-130.636719 58.601563-130.636719 130.636719-130.636719 130.636719 58.601563 130.636719 130.636719zm0 0"/>
+        <path d="m256 155.363281c-55.492188 0-100.636719 45.144531-100.636719 100.636719s45.144531 100.636719 100.636719 100.636719 100.636719-45.144531 100.636719-100.636719-45.144531-100.636719-100.636719-100.636719zm0 0"/>
+      </svg>
+    </button>
 
-  const applyTheme = (isDark) => {
-    document.documentElement.classList.toggle("dark", isDark);
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-  };
+    <div id="settings-panel" class="settings-panel hidden">
+      <label class="flex items-center space-x-2">
+        <input type="checkbox" id="theme-toggle" />
+        <span>Dark theme</span>
+      </label>
+    </div>
+  </div>
 
-  const savedTheme = localStorage.getItem("theme");
-  const isDark = savedTheme === "dark";
-  applyTheme(isDark);
-  if (themeToggle) themeToggle.checked = isDark;
+  <img src="logo-final.png" alt="SpinMix logo" class="w-28 h-28 mb-2 mx-auto" />
+  <h1 class="text-xl font-bold text-center">SpinMix — Rubik's Cube Scramble Generator</h1>
+  <p class="text-center max-w-lg">Free scramble generator with WCA notation and visual 2D cube layout.</p>
 
-  if (themeToggle) {
-    themeToggle.addEventListener("change", () => {
-      applyTheme(themeToggle.checked);
+  <div>
+    <button onclick="newScramble()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">New Scramble</button>
+    <button onclick="copyScramble()" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Copy</button>
+  </div>
+
+  <div id="scramble" class="text-lg font-mono mt-4 text-center">Loading...</div>
+
+  <div class="grid" style="grid-template-columns: repeat(5, auto); gap: 8px; justify-content: center; user-select:none;">
+    <div></div>
+    <div class="face" id="U"></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div class="face" id="L"></div>
+    <div class="face" id="F"></div>
+    <div class="face" id="R"></div>
+    <div class="face" id="B"></div>
+    <div></div>
+    <div></div>
+    <div class="face" id="D"></div>
+    <div></div>
+    <div></div>
+  </div>
+
+  <script>
+    const FACE_ORDER = ["U", "L", "F", "R", "B", "D"];
+    const COLOR_MAP = {
+      U: "white",
+      D: "yellow",
+      F: "green",
+      B: "blue",
+      L: "orange",
+      R: "red"
+    };
+
+    function renderCubeState(cube) {
+      const state = cube.asString();
+      const faceStickers = {
+        U: state.slice(0, 9).split(""),
+        R: state.slice(9, 18).split(""),
+        F: state.slice(18, 27).split(""),
+        D: state.slice(27, 36).split(""),
+        L: state.slice(36, 45).split(""),
+        B: state.slice(45, 54).split("")
+      };
+      ["U", "L", "F", "R", "B", "D"].forEach(face => {
+        const el = document.getElementById(face);
+        el.innerHTML = '';
+        faceStickers[face].forEach(c => {
+          const div = document.createElement("div");
+          div.className = "sticker";
+          div.style.background = COLOR_MAP[c];
+          el.appendChild(div);
+        });
+      });
+      adaptUI();
+    }
+
+    function randomScramble(length = 20) {
+      const faces = ['U','D','L','R','F','B'];
+      const mods = ["", "'", "2"];
+      let result = [], last = "";
+
+      while (result.length < length) {
+        const f = faces[Math.floor(Math.random() * 6)];
+        if (f === last) continue;
+        last = f;
+        const mod = mods[Math.floor(Math.random() * 3)];
+        result.push(f + mod);
+      }
+      return result.join(" ");
+    }
+
+    function newScramble() {
+      const s = randomScramble();
+      document.getElementById("scramble").innerText = s;
+      const cube = new Cube();
+      cube.move(s);
+      renderCubeState(cube);
+    }
+
+    function copyScramble() {
+      const text = document.getElementById("scramble").innerText;
+      navigator.clipboard.writeText(text);
+    }
+
+    function adaptUI() {
+      const w = window.innerWidth;
+      const scale = w < 500 ? 16 : w < 1000 ? 24 : 32;
+      const stickers = document.querySelectorAll('.sticker');
+      stickers.forEach(s => {
+        s.style.width = scale + "px";
+        s.style.height = scale + "px";
+        s.style.border = "1px solid #999";
+      });
+      document.getElementById("scramble").style.fontSize = w < 500 ? "1rem" : w < 1000 ? "1.25rem" : "1.5rem";
+    }
+
+    window.addEventListener("resize", adaptUI);
+    document.addEventListener("DOMContentLoaded", () => {
+      // apply saved theme
+      const saved = localStorage.getItem("theme");
+      document.body.classList.remove("light", "dark");
+      document.body.classList.add(saved === "dark" ? "dark" : "light");
+      document.getElementById("theme-toggle").checked = saved === "dark";
+
+      // toggle theme
+      document.getElementById("theme-toggle").addEventListener("change", (e) => {
+        const isDark = e.target.checked;
+        document.body.classList.remove("light", "dark");
+        document.body.classList.add(isDark ? "dark" : "light");
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+      });
+
+      // toggle settings panel
+      document.getElementById("settings-button").addEventListener("click", () => {
+        document.getElementById("settings-panel").classList.toggle("hidden");
+      });
+
+      newScramble();
     });
-  }
-
-  if (settingsBtn && settingsPanel) {
-    settingsBtn.addEventListener("click", () => {
-      settingsPanel.classList.toggle("hidden");
-    });
-  }
-});
-</script></body>
+  </script>
+</body>
 </html>
