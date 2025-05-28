@@ -13,31 +13,26 @@
       background-color: #f3f4f6;
       color: #111827;
     }
-
     body.dark {
       background-color: #111827;
       color: #f3f4f6;
     }
-
     .face {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1px;
     }
-
     .sticker {
       width: 24px;
       height: 24px;
       border: 1px solid #999;
     }
-
     @media (max-width: 500px) {
       .sticker {
         width: 16px;
         height: 16px;
       }
     }
-
     .settings-panel {
       position: absolute;
       right: 1rem;
@@ -48,12 +43,30 @@
       padding: 0.5rem;
       border-radius: 8px;
       z-index: 10;
+      min-width: 140px; /* чуть шире */
+      white-space: nowrap;
     }
-
     body.dark .settings-panel {
       background-color: #1f2937;
       color: #f3f4f6;
       border-color: #555;
+    }
+    .logo-img {
+      width: 7rem;
+      height: 7rem;
+      margin-bottom: 0.5rem;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hidden {
+      display: none;
+    }
+    button.copy-btn {
+      color: #111827;
+    }
+    body.dark button.copy-btn {
+      color: #111827;
     }
   </style>
 </head>
@@ -68,7 +81,6 @@
         <path d="m256 155.363281c-55.492188 0-100.636719 45.144531-100.636719 100.636719s45.144531 100.636719 100.636719 100.636719 100.636719-45.144531 100.636719-100.636719-45.144531-100.636719-100.636719-100.636719zm0 0"/>
       </svg>
     </button>
-
     <div id="settings-panel" class="settings-panel hidden">
       <label class="flex items-center space-x-2">
         <input type="checkbox" id="theme-toggle" />
@@ -77,13 +89,16 @@
     </div>
   </div>
 
-  <img src="logo-final.png" alt="SpinMix logo" class="w-28 h-28 mb-2 mx-auto" />
+  <!-- Два логотипа: -->
+  <img src="logo-final.png" id="logo-light" class="logo-img" alt="SpinMix logo (light)" />
+  <img src="logo-final-dark.png" id="logo-dark" class="logo-img hidden" alt="SpinMix logo (dark)" />
+
   <h1 class="text-xl font-bold text-center">SpinMix — Rubik's Cube Scramble Generator</h1>
   <p class="text-center max-w-lg">Free scramble generator with WCA notation and visual 2D cube layout.</p>
 
   <div>
     <button onclick="newScramble()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">New Scramble</button>
-    <button onclick="copyScramble()" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Copy</button>
+    <button onclick="copyScramble()" class="copy-btn bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Copy</button>
   </div>
 
   <div id="scramble" class="text-lg font-mono mt-4 text-center">Loading...</div>
@@ -106,6 +121,7 @@
   </div>
 
   <script>
+    // --- Scramble + Cube logic ---
     const FACE_ORDER = ["U", "L", "F", "R", "B", "D"];
     const COLOR_MAP = {
       U: "white",
@@ -179,13 +195,22 @@
       document.getElementById("scramble").style.fontSize = w < 500 ? "1rem" : w < 1000 ? "1.25rem" : "1.5rem";
     }
 
+    // --- Theme logic, logo switching, settings panel ---
+    function updateLogoTheme(isDark) {
+      document.getElementById('logo-light').classList.toggle('hidden', isDark);
+      document.getElementById('logo-dark').classList.toggle('hidden', !isDark);
+    }
+
     window.addEventListener("resize", adaptUI);
+
     document.addEventListener("DOMContentLoaded", () => {
       // apply saved theme
       const saved = localStorage.getItem("theme");
       document.body.classList.remove("light", "dark");
       document.body.classList.add(saved === "dark" ? "dark" : "light");
-      document.getElementById("theme-toggle").checked = saved === "dark";
+      const isDark = saved === "dark";
+      document.getElementById("theme-toggle").checked = isDark;
+      updateLogoTheme(isDark);
 
       // toggle theme
       document.getElementById("theme-toggle").addEventListener("change", (e) => {
@@ -193,6 +218,7 @@
         document.body.classList.remove("light", "dark");
         document.body.classList.add(isDark ? "dark" : "light");
         localStorage.setItem("theme", isDark ? "dark" : "light");
+        updateLogoTheme(isDark);
       });
 
       // toggle settings panel
