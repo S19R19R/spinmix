@@ -27,11 +27,12 @@
     }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-900 flex flex-col items-center justify-center min-h-screen p-2 space-y-4">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col items-center justify-center min-h-screen p-2 space-y-4">
 <div class="absolute top-2 right-2 flex items-center space-x-2">
 <button class="text-gray-700 dark:text-gray-200" id="settings-button">
-<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-<path d="M9.75 3a.75.75 0 01.75.75v.19a7.482 7.482 0 012.1 0v-.19a.75.75 0 011.5 0v.19a7.492 7.492 0 011.665.975.75.75 0 11-.83 1.26A5.99 5.99 0 0012 5c-1.003 0-1.94.248-2.75.685a.75.75 0 11-.83-1.26A7.492 7.492 0 019.75 3zM4.22 8.22a.75.75 0 011.06 0l.49.49A7.457 7.457 0 005 12c0 1.265.294 2.463.77 3.53l-.49.49a.75.75 0 11-1.06-1.06l.44-.44A5.99 5.99 0 015 12c0-1.003.248-1.94.685-2.75l-.465-.465a.75.75 0 010-1.06zM12 6.5a5.5 5.5 0 015.5 5.5.75.75 0 01-1.5 0A4 4 0 0012 8a.75.75 0 010-1.5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M11.25 3.375c.621-1.072 1.879-1.072 2.5 0l.528.912a1.5 1.5 0 001.287.75h1.056c1.23 0 2.003 1.289 1.434 2.4l-.528.912a1.5 1.5 0 000 1.5l.528.912c.569 1.111-.204 2.4-1.434 2.4h-1.056a1.5 1.5 0 00-1.287.75l-.528.912c-.621 1.072-1.879 1.072-2.5 0l-.528-.912a1.5 1.5 0 00-1.287-.75H8.25c-1.23 0-2.003-1.289-1.434-2.4l.528-.912a1.5 1.5 0 000-1.5l-.528-.912c-.569-1.111.204-2.4 1.434-2.4h1.056a1.5 1.5 0 001.287-.75l.528-.912z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path>
 </svg>
 </button>
 <div class="hidden bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded p-2 shadow" id="settings-panel">
@@ -41,10 +42,9 @@
 </label>
 </div>
 </div>
-
 <img alt="SpinMix logo" class="w-28 h-28 mb-2 mx-auto" src="logo-final.png"/>
-<h1 class="text-xl font-bold text-center">SpinMix — Rubik's Cube Scramble Generator</h1>
-<p class="text-center text-gray-700 max-w-lg">Free scramble generator with WCA notation and visual 2D cube layout.</p>
+<h1 class="text-xl font-bold text-center text-gray-900 dark:text-gray-100">SpinMix — Rubik's Cube Scramble Generator</h1>
+<p class="text-center text-gray-700 dark:text-gray-300 max-w-lg">Free scramble generator with WCA notation and visual 2D cube layout.</p>
 <div>
 <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="newScramble()">New Scramble</button>
 <button class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400" onclick="copyScramble()">Copy</button>
