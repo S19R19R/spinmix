@@ -8,13 +8,7 @@
 <meta content="SpinMix is a free online scramble generator and visualizer for the Rubik’s Cube (2x2, 3x3, 4x4 and more) with WCA-notation support." name="description"/>
 <!-- Google tag (gtag.js) -->
 <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-P0DLH9JPVQ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-P0DLH9JPVQ');
-</script>
 <link href="favicon.ico" rel="icon" type="image/x-icon"/>
 <link href="https://spinmix.me/" rel="canonical"/>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
@@ -30,9 +24,8 @@
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col items-center justify-center min-h-screen p-2 space-y-4">
 <div class="absolute top-2 right-2 flex items-center space-x-2">
 <button class="text-gray-700 dark:text-gray-200" id="settings-button">
-<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-<path d="M11.25 3.375c.621-1.072 1.879-1.072 2.5 0l.528.912a1.5 1.5 0 001.287.75h1.056c1.23 0 2.003 1.289 1.434 2.4l-.528.912a1.5 1.5 0 000 1.5l.528.912c.569 1.111-.204 2.4-1.434 2.4h-1.056a1.5 1.5 0 00-1.287.75l-.528.912c-.621 1.072-1.879 1.072-2.5 0l-.528-.912a1.5 1.5 0 00-1.287-.75H8.25c-1.23 0-2.003-1.289-1.434-2.4l.528-.912a1.5 1.5 0 000-1.5l-.528-.912c-.569-1.111.204-2.4 1.434-2.4h1.056a1.5 1.5 0 001.287-.75l.528-.912z" stroke-linecap="round" stroke-linejoin="round"></path>
-<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+<svg class="w-8 h-8" fill="currentColor" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M11.983 1.077a1 1 0 011.034 0l1.413.815a1 1 0 00.95 0l1.412-.815a1 1 0 011.516.858v1.63a1 1 0 00.432.832l1.38.892a1 1 0 01.36 1.155l-.568 1.598a1 1 0 000 .633l.568 1.598a1 1 0 01-.36 1.155l-1.38.892a1 1 0 00-.432.832v1.63a1 1 0 01-1.516.858l-1.412-.815a1 1 0 00-.95 0l-1.413.815a1 1 0 01-1.034 0l-1.412-.815a1 1 0 00-.95 0l-1.413.815a1 1 0 01-1.516-.858v-1.63a1 1 0 00-.432-.832l-1.38-.892a1 1 0 01-.36-1.155l.568-1.598a1 1 0 000-.633l-.568-1.598a1 1 0 01.36-1.155l1.38-.892a1 1 0 00.432-.832v-1.63a1 1 0 011.516-.858l1.413.815a1 1 0 00.95 0l1.412-.815zM12 15a3 3 0 100-6 3 3 0 000 6z" fill-rule="evenodd"></path>
 </svg>
 </button>
 <div class="hidden bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded p-2 shadow" id="settings-panel">
