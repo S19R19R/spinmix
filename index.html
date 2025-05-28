@@ -27,11 +27,12 @@
     }
   </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col items-center justify-center min-h-screen p-2 space-y-4 transition-colors duration-300">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col items-center justify-center min-h-screen p-2 space-y-4">
 <div class="absolute top-2 right-2 flex items-center space-x-2">
 <button class="text-gray-700 dark:text-gray-200" id="settings-button">
-<svg class="w-8 h-8" fill="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-<path d="M19.14,12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5,0,0,0,.12-.66l-1.92-3.32a.5.5,0,0,0-.61-.22l-2.39,1a7.03,7.03,0,0,0-1.62-.94l-.36-2.54A.5.5,0,0,0,14.34,3H9.66a.5.5,0,0,0-.49.42l-.36,2.54a7.03,7.03,0,0,0-1.62.94l-2.39-1a.5.5,0,0,0-.61.22L2.27,8.44a.5.5,0,0,0,.12.66l2.03,1.58c-.04.31-.06.63-.06.94s.02.63.06.94L2.39,13.6a.5.5,0,0,0-.12.66l1.92,3.32a.5.5,0,0,0,.61.22l2.39-1c.5.39,1.04.72,1.62.94l.36,2.54a.5.5,0,0,0,.49.42h4.68a.5.5,0,0,0,.49-.42l.36-2.54a7.03,7.03,0,0,0,1.62-.94l2.39,1a.5.5,0,0,0,.61-.22l1.92-3.32a.5.5,0,0,0-.12-.66Zm-7.14,2.56A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z"></path>
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M11.25 3.375c.621-1.072 1.879-1.072 2.5 0l.528.912a1.5 1.5 0 001.287.75h1.056c1.23 0 2.003 1.289 1.434 2.4l-.528.912a1.5 1.5 0 000 1.5l.528.912c.569 1.111-.204 2.4-1.434 2.4h-1.056a1.5 1.5 0 00-1.287.75l-.528.912c-.621 1.072-1.879 1.072-2.5 0l-.528-.912a1.5 1.5 0 00-1.287-.75H8.25c-1.23 0-2.003-1.289-1.434-2.4l.528-.912a1.5 1.5 0 000-1.5l-.528-.912c-.569-1.111.204-2.4 1.434-2.4h1.056a1.5 1.5 0 001.287-.75l.528-.912z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path>
 </svg>
 </button>
 <div class="hidden bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded p-2 shadow" id="settings-panel">
@@ -66,135 +67,109 @@
 <div></div>
 <div></div>
 </div>
+
 <script>
-    const FACE_ORDER = ["U", "L", "F", "R", "B", "D"];
-    const COLOR_MAP = {
-      U: "white",
-      D: "yellow",
-      F: "green",
-      B: "blue",
-      L: "orange",
-      R: "red"
-    };
+const FACE_ORDER = ["U", "L", "F", "R", "B", "D"];
+const COLOR_MAP = {
+  U: "white",
+  D: "yellow",
+  F: "green",
+  B: "blue",
+  L: "orange",
+  R: "red"
+};
 
-    function renderCubeState(cube) {
-      // cube.asString() возвращает строку 54 стикеров: U, R, F, D, L, B (по 9)
-      const state = cube.asString();
-      const faceStickers = {
-        U: state.slice(0, 9).split(""),
-        R: state.slice(9, 18).split(""),
-        F: state.slice(18, 27).split(""),
-        D: state.slice(27, 36).split(""),
-        L: state.slice(36, 45).split(""),
-        B: state.slice(45, 54).split("")
-      };
-      // Наш порядок для развёртки: U, L, F, R, B, D
-      ["U", "L", "F", "R", "B", "D"].forEach(face => {
-        const el = document.getElementById(face);
-        el.innerHTML = '';
-        faceStickers[face].forEach(c => {
-          const div = document.createElement("div");
-          div.className = "sticker";
-          div.style.background = COLOR_MAP[c];
-          el.appendChild(div);
-        });
-      });
-      adaptUI();
-    }
-
-    function randomScramble(length = 20) {
-      const faces = ['U','D','L','R','F','B'];
-      const mods = ["", "'", "2"];
-      let result = [], last = "";
-
-      while (result.length < length) {
-        const f = faces[Math.floor(Math.random() * 6)];
-        if (f === last) continue;
-        last = f;
-        const mod = mods[Math.floor(Math.random() * 3)];
-        result.push(f + mod);
-      }
-      return result.join(" ");
-    }
-
-    function newScramble() {
-      const s = randomScramble();
-      document.getElementById("scramble").innerText = s;
-
-      // cubejs: создаём solved-куб и применяем скрамбл
-      const cube = new Cube();
-      cube.move(s);
-
-      renderCubeState(cube);
-    }
-
-    function copyScramble() {
-      const text = document.getElementById("scramble").innerText;
-      navigator.clipboard.writeText(text);
-    }
-
-    function adaptUI() {
-      const w = window.innerWidth;
-      const scale = w < 500 ? 16 : w < 1000 ? 24 : 32;
-      const stickers = document.querySelectorAll('.sticker');
-      stickers.forEach(s => {
-        s.style.width = scale + "px";
-        s.style.height = scale + "px";
-        s.style.border = "1px solid #999";
-      });
-      document.getElementById("scramble").style.fontSize = w < 500 ? "1rem" : w < 1000 ? "1.25rem" : "1.5rem";
-    }
-
-    window.addEventListener("resize", adaptUI);
-    document.addEventListener("DOMContentLoaded", () => {
-      newScramble();
+function renderCubeState(cube) {
+  const state = cube.asString();
+  const faceStickers = {
+    U: state.slice(0, 9).split(""),
+    R: state.slice(9, 18).split(""),
+    F: state.slice(18, 27).split(""),
+    D: state.slice(27, 36).split(""),
+    L: state.slice(36, 45).split(""),
+    B: state.slice(45, 54).split("")
+  };
+  ["U", "L", "F", "R", "B", "D"].forEach(face => {
+    const el = document.getElementById(face);
+    el.innerHTML = '';
+    faceStickers[face].forEach(c => {
+      const div = document.createElement("div");
+      div.className = "sticker";
+      div.style.background = COLOR_MAP[c];
+      el.appendChild(div);
     });
-  
-// === Dark theme ===
-const themeToggle = document.getElementById("theme-toggle");
-const settingsBtn = document.getElementById("settings-button");
-const settingsPanel = document.getElementById("settings-panel");
-
-const savedTheme = localStorage.getItem("theme");
-if (savedTheme === "dark") {
-  document.documentElement.classList.add("dark");
-  themeToggle.checked = true;
+  });
+  adaptUI();
 }
 
-themeToggle.addEventListener("change", () => {
-  const isDark = themeToggle.checked;
-  document.documentElement.classList.toggle("dark", isDark);
-  localStorage.setItem("theme", isDark ? "dark" : "light");
-});
+function randomScramble(length = 20) {
+  const faces = ['U','D','L','R','F','B'];
+  const mods = ["", "'", "2"];
+  let result = [], last = "";
 
-settingsBtn.addEventListener("click", () => {
-  settingsPanel.classList.toggle("hidden");
-});
-
-// === Dark theme ===
-const themeToggle = document.getElementById("theme-toggle");
-const settingsBtn = document.getElementById("settings-button");
-const settingsPanel = document.getElementById("settings-panel");
-
-// Apply saved theme immediately
-const savedTheme = localStorage.getItem("theme");
-if (savedTheme === "dark") {
-  document.documentElement.classList.add("dark");
-  themeToggle.checked = true;
-} else {
-  document.documentElement.classList.remove("dark");
-  themeToggle.checked = false;
+  while (result.length < length) {
+    const f = faces[Math.floor(Math.random() * 6)];
+    if (f === last) continue;
+    last = f;
+    const mod = mods[Math.floor(Math.random() * 3)];
+    result.push(f + mod);
+  }
+  return result.join(" ");
 }
 
-themeToggle.addEventListener("change", () => {
-  const isDark = themeToggle.checked;
-  document.documentElement.classList.toggle("dark", isDark);
-  localStorage.setItem("theme", isDark ? "dark" : "light");
-});
+function newScramble() {
+  const s = randomScramble();
+  document.getElementById("scramble").innerText = s;
+  const cube = new Cube();
+  cube.move(s);
+  renderCubeState(cube);
+}
 
-settingsBtn.addEventListener("click", () => {
-  settingsPanel.classList.toggle("hidden");
+function copyScramble() {
+  const text = document.getElementById("scramble").innerText;
+  navigator.clipboard.writeText(text);
+}
+
+function adaptUI() {
+  const w = window.innerWidth;
+  const scale = w < 500 ? 16 : w < 1000 ? 24 : 32;
+  const stickers = document.querySelectorAll('.sticker');
+  stickers.forEach(s => {
+    s.style.width = scale + "px";
+    s.style.height = scale + "px";
+    s.style.border = "1px solid #999";
+  });
+  document.getElementById("scramble").style.fontSize = w < 500 ? "1rem" : w < 1000 ? "1.25rem" : "1.5rem";
+}
+
+window.addEventListener("resize", adaptUI);
+document.addEventListener("DOMContentLoaded", () => {
+  newScramble();
 });
-</script>
-</body>
+</script><script>
+document.addEventListener("DOMContentLoaded", () => {
+  const themeToggle = document.getElementById("theme-toggle");
+  const settingsBtn = document.getElementById("settings-button");
+  const settingsPanel = document.getElementById("settings-panel");
+
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "dark") {
+    document.documentElement.classList.add("dark");
+    themeToggle.checked = true;
+  } else {
+    document.documentElement.classList.remove("dark");
+    themeToggle.checked = false;
+  }
+
+  themeToggle.addEventListener("change", () => {
+    const isDark = themeToggle.checked;
+    document.documentElement.classList.toggle("dark", isDark);
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  });
+
+  settingsBtn.addEventListener("click", () => {
+    settingsPanel.classList.toggle("hidden");
+  });
+});
+</script></body>
 </html>
